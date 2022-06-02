@@ -10,6 +10,7 @@ class Patient:
         for k, v in kwargs:
             self.__dict__[k] = v
 
+
     def get_trans_prob(self):
         return np.array([[0.9047, 0.0876, 0, 0, 0.0077],
                          [0.0510, 0.9001, 0.0362, 0, 0.0128],
