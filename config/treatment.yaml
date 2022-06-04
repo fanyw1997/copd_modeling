@@ -1,0 +1,19 @@
+type: category
+
+depend: detected
+
+initial:
+    T:
+        T: 0.8
+        F: 0.2
+    F:
+        T: 0.0
+        F: 1.0
+
+incidence:
+    T:
+        T: 0.8
+        F: 0.2
+    F:
+        T: 0.0
+        F: 1.0

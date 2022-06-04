@@ -1,0 +1,9 @@
+# 按顺序generate attributes，有depend条件的变量要在后面generate
+
+attributes:
+  - sex
+  - state
+  - age
+  - detected
+  - treatment
+  - treatment_method

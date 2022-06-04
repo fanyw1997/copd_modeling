@@ -1,0 +1,31 @@
+type: category
+
+depend: state
+
+initial:
+    GOLD1:
+        T: 0.5
+        F: 0.5
+    GOLD2:
+        T: 0.5
+        F: 0.5
+    GOLD3:
+        T: 0.5
+        F: 0.5
+    GOLD4:
+        T: 0.5
+        F: 0.5
+
+incidence:
+    GOLD1:
+        T: 0.5
+        F: 0.5
+    GOLD2:
+        T: 0.5
+        F: 0.5
+    GOLD3:
+        T: 0.5
+        F: 0.5
+    GOLD4:
+        T: 0.5
+        F: 0.5

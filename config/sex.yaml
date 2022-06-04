@@ -1,0 +1,13 @@
+type: category
+
+depend: ~
+
+initial:
+    ~:
+        male: 0.5
+        female: 0.5
+
+incidence:
+    ~:
+        male: 0.5
+        female: 0.5

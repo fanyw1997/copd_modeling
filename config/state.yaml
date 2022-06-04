@@ -1,0 +1,17 @@
+type: category
+
+depend: ~
+
+initial:
+    ~:
+        GOLD1: 0.4
+        GOLD2: 0.2
+        GOLD3: 0.2
+        GOLD4: 0.2
+
+incidence:
+    ~:
+        GOLD1: 0.4
+        GOLD2: 0.2
+        GOLD3: 0.2
+        GOLD4: 0.2

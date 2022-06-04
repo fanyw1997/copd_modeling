@@ -1,0 +1,19 @@
+type: category
+
+depend: treatment
+
+initial:
+    T:
+        T1: 0.8
+        T2: 0.2
+    F:
+        T1: 0.8
+        T2: 0.2
+
+incidence:
+    T:
+        T1: 0.8
+        T2: 0.2
+    F:
+        T1: 0.8
+        T2: 0.2
