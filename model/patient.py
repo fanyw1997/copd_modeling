@@ -1,6 +1,12 @@
 import numpy as np
 
 class Patient:
+    """
+    1.  给Patient加上性别和年龄
+    2.  get_trans_prob函数概率基于患者性别和年龄
+    3.  生成患者时，年龄和性别比例
+    """
+
     def __init__(self, **kwargs):
         self._num_states = 5
         self._state = 0
@@ -10,6 +16,8 @@ class Patient:
         for k, v in kwargs:
             self.__dict__[k] = v
 
+    def get_attribute(self, k: str):
+        return self.__dict__[k]
 
     def get_trans_prob(self):
         return np.array([[0.9047, 0.0876, 0, 0, 0.0077],
@@ -32,3 +40,6 @@ class Patient:
 
         self._state = target
         return target
+
+    def print(self):
+        print(self.__dict__)

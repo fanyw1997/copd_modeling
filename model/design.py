@@ -1,4 +1,6 @@
 from model.patient import Patient
+from fileio.read_yaml import Reader
+import numpy as np
 
 class Model:
     def __init__(self,
