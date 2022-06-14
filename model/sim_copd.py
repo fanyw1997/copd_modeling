@@ -123,7 +123,7 @@ class SimulatorCOPD:
 
     def _add_patients(self, num_patients: int = 1, circum: str = 'incidence'):
         assert circum in ['incidence', 'initial'] # 确保circum只能取值incidence或initial
-        for i in range(num_patients):
+        for i in tqdm.tqdm(range(num_patients)) if circum == 'initial' else range(num_patients):
             patient = Patient()
 
             # 获取attr生成的顺序，按先后处理patient的各个attr
