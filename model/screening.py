@@ -24,7 +24,7 @@ class ScreeningMethod1(ScreeningMethod):
             if float(np.random.random()) <= self._sensitivity:
                 patient.set_attributes(detected=True)
 
-from parameters.consts import screening_strategy_1_month_method
+
 
 class ScreeningStrategy:
     # Strategy定义了screening的时间和对应的method

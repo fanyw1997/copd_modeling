@@ -4,7 +4,6 @@ import math
 from enums.attribute import State
 from enums.exacerbation import ExacerbationLevels
 from model.patient import Patient
-from model.screening import ScreeningMethod
 from parameters.consts import exacerbation_annual_rate, exacerbation_severe_mortality_prob
 
 

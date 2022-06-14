@@ -1,6 +1,5 @@
 from enums.exacerbation import ExacerbationLevels
 from enums.attribute import State
-from model.screening import ScreeningMethod1, ScreeningStrategy1
 
 """
 parameters related to exacerbation
@@ -31,19 +30,6 @@ exacerbation_severe_mortality_prob = {
 }
 
 """
-screening strategy decision: choose which strategy
-screening strategy: at which simulation month, use what method
-"""
-
-screening_strategy_decision = ScreeningStrategy1()
-
-screening_strategy_1_month_method = {
-    5 * 12: ScreeningMethod1(),
-    10 * 12: ScreeningMethod1()
-}
-
-
-"""
 columns contained in the output file
 """
 simulator_output_columns = [
@@ -66,3 +52,16 @@ simulator_output_columns = [
     'num_patient_detected_sum',
 
 ]
+
+"""
+screening strategy decision: choose which strategy
+screening strategy: at which simulation month, use what method
+"""
+from model.screening import ScreeningMethod1
+screening_strategy_1_month_method = {
+    5 * 12: ScreeningMethod1(),
+    10 * 12: ScreeningMethod1()
+}
+
+from model.screening import ScreeningStrategy1
+screening_strategy_decision = ScreeningStrategy1()
