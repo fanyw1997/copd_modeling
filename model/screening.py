@@ -42,4 +42,5 @@ class ScreeningStrategy:
 
 class ScreeningStrategy1(ScreeningStrategy):
     def __init__(self):
+        from parameters.consts import screening_strategy_1_month_method
         super().__init__(screening_strategy_1_month_method)
