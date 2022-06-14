@@ -9,7 +9,7 @@ global: cycle length 和 time horizon设定
 patient: attributes分布从文件读取，patient根据分布生成attributes
 
 ### output处理
-states: 输出每轮处在各个state的patient数量
+state: 输出每轮处在各个state的patient数量
 
 ## 计划完成
 ### simulate框架

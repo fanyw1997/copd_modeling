@@ -10,36 +10,131 @@ from utils.read_patient_attributes import AttributeReader
 from parameters.consts import simulator_output_columns
 from utils.time_convert import TimeConvert
 
-class Model:
+
+class SimulatorCOPD:
     def __init__(self,
                  cycle_length: int,
                  time_horizon: int,
+                 num_individual: int,
+                 time_convert: TimeConvert,
                  discount_rate_utility: float = 0.03,
-                 discount_rate_cost: float = 0.03,
-                 num_states: int = 5,
+                 discount_rate_cost: float = 0.03
                  ):
+        """
+        :param cycle_length:            month
+        :param time_horizon:            month * cycle number
+        """
+
+        # Simulation-related parameters
         self._cycle_length = cycle_length
         self._time_horizon = time_horizon
         self._discount_rate_utility = discount_rate_utility
         self._discount_rate_cost = discount_rate_cost
-        self._num_states = num_states
-        self._patients = []
-        self._reader = Reader()
+        self._time_convert = time_convert
 
-    def add_patients(self, num_patients: int = 1, circum: str = 'incidence'):
+        # Initialization-related parameters
+        self._num_individual = num_individual
+
+        # Patients setups
+        self._reader = AttributeReader()
+        self._patients = []
+
+        # Simulation events
+        self._screening_strategy_instance = ScreeningStrategy1()
+        self._exacerbation_instance = Exacerbation(self._cycle_length)
+
+        # Statistics
+        self._result_columns = ['current_month'] + simulator_output_columns
+
+        self._result_df = pd.DataFrame(columns=self._result_columns)
+        self._stat_cycle_id = 0
+        self._stat_state_counter = [0] * len(State)
+        self._stat_detected_state_counter = [0] * len(State)
+
+
+    def simulate(self):
+        self._init(self._num_individual)
+        for current_month in tqdm.tqdm(range(0, self._time_horizon, self._cycle_length)):
+            self._simulate_one_cycle(current_month)
+
+        self._result_simulation_output('result.csv')
+
+    def _init(self, num_individual: int):
+        """
+        Each time simulate() is called, _init() will initialize the stats variables and add patient.
+        :param num_individual:
+        :return:
+        """
+
+        self._result_df = pd.DataFrame(columns=self._result_columns)
+        self._stat_cycle_id = 0
+        self._stat_state_counter = [0] * len(State)
+        self._stat_detected_state_counter = [0] * len(State)
+
+        self._add_patients(num_individual, 'initial')
+
+
+
+    def _simulate_one_cycle(self, current_month: int):
+        self._incidence()
+        self._screening(self._screening_strategy_instance, current_month)
+        self._treatment()
+        self._exacerbation(self._exacerbation_instance)
+        self._state_transit()
+        self._stat_cycle_id += 1
+        self._result_cycle_analysis(current_month)
+
+    def _decrease_state_counter(self, patient: Patient):
+        state = patient.get_attribute('state').value
+        self._stat_state_counter[state] -= 1
+        self._stat_detected_state_counter[state] -= patient.get_attribute('detected').value
+
+    def _increase_state_counter(self, patient: Patient):
+        state = patient.get_attribute('state').value
+        self._stat_state_counter[state] += 1
+        self._stat_detected_state_counter[state] += patient.get_attribute('detected').value
+
+    def _incidence(self):
+        self._add_patients(self._incidence_num(), 'incidence')
+
+    def _incidence_num(self):
+        return 10
+
+    def _screening(self, scr_strategy: ScreeningStrategy, current_cycle: int):
+        for patient in self._patients:
+            self._decrease_state_counter(patient)
+            scr_strategy.screen(patient, current_cycle)
+            self._increase_state_counter(patient)
+
+    def _treatment(self):
+        pass
+
+    def _exacerbation(self, exacerbation: Exacerbation):
+        for patient in self._patients:
+            self._decrease_state_counter(patient)
+            exacerbation.exacerbate(patient)
+            self._increase_state_counter(patient)
+
+    def _state_transit(self):
+        for patient in self._patients:
+            self._decrease_state_counter(patient)
+            patient.transit()
+            self._increase_state_counter(patient)
+
+    def _add_patients(self, num_patients: int = 1, circum: str = 'incidence'):
         assert circum in ['incidence', 'initial'] # 确保circum只能取值incidence或initial
         for i in range(num_patients):
             patient = Patient()
 
             # 获取attr生成的顺序，按先后处理patient的各个attr
-            for attr in self._reader.get_attributes_order():
-                attr_reader = self._reader.get_attributes()[attr]
-                df = attr_reader.get_initial() if circum == 'initial' else attr_reader.get_incidence()
-                attr_type = attr_reader.get_attr_type()
+            for attribute in self._reader.get_attribute_order():
+                attribute_parser = self._reader.get_attribute_list()[attribute]
+                df = attribute_parser.get_attribute_initial() if circum == 'initial' else attribute_parser.get_attribute_incidence()
+                attribute_type = attribute_parser.get_attribute_type()
 
-                depend_key = df.loc[0]['depend_key']
-                if not depend_key is None:
-                    patient_depend = patient.get_attribute(depend_key)
+                depend_attr = df.loc[0]['depend_attr']
+                if not depend_attr is None:
+                    patient_depend = patient.get_attribute(depend_attr)
                     df = df[df['depend_value'] == patient_depend]
 
                 # 根据input的分布给patient随机分配该attr的值
@@ -53,12 +148,12 @@ class Model:
                     if temp_sum >= temp_random:
                         target_row = i
                         break
-                if attr_type == 'integer':
+                if attribute_type == 'integer':
                     lower = df.iloc[target_row]['attr_lower']
                     upper = df.iloc[target_row]['attr_upper']
-                    patient.__dict__[attr] = np.random.randint(lower, upper)
+                    patient.set_attribute_kv(attribute, np.random.randint(lower, upper))
                 else:
-                    patient.__dict__[attr] = df.iloc[target_row]['attr_category']
+                    patient.set_attribute_kv(attribute, df.iloc[target_row]['attr_category'])
 
             self._patients.append(patient)
             self._increase_state_counter(patient)
