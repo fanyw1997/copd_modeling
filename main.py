@@ -1,18 +1,15 @@
-from model.patient import Patient
-from model.design import Model
+from model.sim_copd import SimulatorCOPD
+from utils.time_convert import TimeConvert
+
 
 def main():
-    m = Model(cycle_length = 12,
-              time_horizon = 12*50,
-              # discount_rate_utility = 0.03,
-              # discount_rate_cost: float = 0.03,
-              # num_states: int = 5,
-    )
-    m.add_patients(num_patients = 10)
-    for patient in m._patients:
-        patient.print()
-    # for i in range(m._time_horizon // m._cycle_length):
-    #     m.simulate()
+    tc = TimeConvert(2022, 6)
+    m = SimulatorCOPD(cycle_length = 12,
+                      time_horizon = 12*50,
+                      num_individual = 1000,
+                      time_convert = tc,
+                      )
+    m.simulate()
 
 if __name__ == '__main__':
     main()

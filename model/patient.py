@@ -1,5 +1,8 @@
 import numpy as np
 
+from enums.exacerbation import ExacerbationLevels
+from enums.attribute import State
+
 class Patient:
     """
     1.  给Patient加上性别和年龄
@@ -8,16 +11,29 @@ class Patient:
     """
 
     def __init__(self, **kwargs):
-        self._num_states = 5
-        self._state = 0
+        # 预置默认值
+        self._num_state = len(State)
+        self._state = State(0)
+
+        self._sex = None
+        self._age = None
+        self._detected = None
+        self._treatment = None
+        self._treatment_method = None
+        self._exacerbation = ExacerbationLevels(0)
+
+        # 添加预处理的值
         self.set_attributes(**kwargs)
 
     def set_attributes(self, **kwargs):
-        for k, v in kwargs:
-            self.__dict__[k] = v
+        for k, v in kwargs.items():
+            self.__dict__[f'_{k}'] = v
+
+    def set_attribute_kv(self, key: str, value: object):
+        self.__dict__[f'_{key}'] = value
 
     def get_attribute(self, k: str):
-        return self.__dict__[k]
+        return self.__dict__[f'_{k}']
 
     def get_trans_prob(self):
         return np.array([[0.9047, 0.0876, 0, 0, 0.0077],
@@ -38,8 +54,11 @@ class Patient:
                 target = i
                 break
 
-        self._state = target
+        self._state = State(target)
         return target
 
     def print(self):
         print(self.__dict__)
+
+if __name__ == '__main__':
+    a = Patient()

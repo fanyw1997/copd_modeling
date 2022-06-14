@@ -1,5 +1,10 @@
+import os
+from enum import Enum
+
 import yaml
 import pandas as pd
+
+from enums import *
 
 class Reader:
     def __init__(self,
@@ -24,6 +29,7 @@ class AttrReader:
     def __init__(self,
                  filename_attr):
         self._filename_attr = filename_attr
+        self._attribute_name = os.path.splitext(os.path.basename(filename_attr))[0]
         self._attr_type = None
 
     def attr_read(self):
@@ -44,8 +50,13 @@ class AttrReader:
                 读取integer类别attributes的分布
                 """
                 # attr_开头的是变量自身的信息，depend开头的是和变量相关的变量的信息
-                df = pd.DataFrame(columns = ['attr_lower', 'attr_upper', 'depend_key', 'depend_value', 'attr_value'])
+                # depend_attr 是该变量对应的枚举类字符串， depend_value 是该变量对应的枚举类型的元素
+                df = pd.DataFrame(columns = ['attr_lower', 'attr_upper', 'depend_attr', 'depend_value', 'attr_value'])
+                # 'attr_lower': int, 'attr_upper': int, 'depend_attr': str, 'depend_value': Enum, 'attr_value': float
+
                 for depend_value in yaml_dict:
+                    depend_element = get_enum_element(depend_attr, depend_value) \
+                        if depend_attr is not None else None
                     keys = list(yaml_dict[depend_value].keys())
                     keys.sort()
                     for i in range(len(keys) - 1): # integer类型的最后一行为取值上限，分布概率恒为0，所以不需要处理
@@ -57,8 +68,12 @@ class AttrReader:
                 """
                 读取category类别attributes的分布
                 """
-                df = pd.DataFrame(columns=['attr_category', 'depend_key', 'depend_value', 'attr_value'])
+                df = pd.DataFrame(columns=['attr_category', 'depend_attr', 'depend_value', 'attr_value'])
+                # 'attr_category': Enum, 'depend_attr': str, 'depend_value': Enum, 'attr_value': float
+
                 for depend_value in yaml_dict:
+                    depend_element = get_enum_element(depend_attr, depend_value) \
+                        if depend_attr is not None else None
                     keys = list(yaml_dict[depend_value].keys())
                     for i in range(len(keys)):
                         df.loc[len(df)] = [keys[i], depend_key, depend_value, yaml_dict[depend_value][keys[i]]]
